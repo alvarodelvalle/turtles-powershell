@@ -136,7 +136,7 @@ Describe 'Convert-Customers' {
         Mock Import-Csv {
             $null
         }
-        It 'Should do xxxxxx' {
+        It 'Should return no errors' {
             $y = Convert-Customers -Path TestDrive:\import.csv
             $y | Should -MatchExactly ''
         }
