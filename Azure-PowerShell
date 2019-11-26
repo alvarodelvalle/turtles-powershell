@@ -1,0 +1,51 @@
+Import-Module Az
+
+# connection/authorization
+Connect-AzAccount
+
+# subscription
+Select-AzSubscription -Subscription "Visual Studio Enterprise"
+Get-AzSubscription
+
+# resource group
+Get-AzResourceGroup
+Get-AzResourceGroup -ResourceGroupName TestRG
+Get-AzResourceGroup | Format-Table # format table
+New-AzResourceGroup -Name TestRG -Location centralus
+
+# virtual machines
+New-AzVM
+-ResourceGroupName resource-group-name
+-Name machine-name
+-Credential credentials-object
+-Location location
+-Image image-name
+
+New-AzVM -Name MyVm -ResourceGroupName ExerciseResources -Credential (Get-Credential) # stringing cmdlets
+Remove-AzVM
+Stop-AzVM
+Start-AzVM
+Restart-AzVM
+Update-AzVM
+Write-Verbose -Message $vm
+
+$ResourceGroupName = "ExcerciseResources"
+$vm = Get-AzVM -Name VmName -ResourceGroupName TestRG
+$vm.HardwareProfile.VmSize = "Standard_DS3_v2"
+Update-AzVM -ResourceGroupName $ResourceGroupName -VM $vm
+# pass the vm object into other cmdlets
+$vm | Get-AzPublicIpAddress
+Remove-AzVM -Name $vm.Name -ResourceGroup $vm.ResourceGroupName
+Stop-AzVM -Name $vm.Name -ResourceGroup $vm.ResourceGroupName
+# delete network interface
+$vm | Remove-AzNetworkInterface –Force
+# delete managed os disks and storage account
+Get-AzDisk -ResourceGroupName $vm.ResourceGroupName -DiskName $vm.StorageProfile.OSDisk.Name | Remove-AzDisk -Force
+# delete virtual network
+Get-AzVirtualNetwork -ResourceGroup $vm.ResourceGroupName | Remove-AzVirtualNetwork -Force
+# delete network security group
+Get-AzNetworkSecurityGroup -ResourceGroup $vm.ResourceGroupName | Remove-AzNetworkSecurityGroup -Force
+# delete public ip address
+Get-AzPublicIpAddress -ResourceGroup $vm.ResourceGroupName | Remove-AzPublicIpAddress -Force
+Get-AzResource -ResourceGroupName $vm.ResourceGroupName | Format-Table
+Get-AzResource -ResourceType Microsoft.Compute/virtualMachines
